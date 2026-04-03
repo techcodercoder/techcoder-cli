@@ -1,13 +1,13 @@
 import os
 import shlex
 
-from config import build_system_prompt
-from chat import chat
-from file_handler import read_file, read_files, write_file, extract_code, scan_project
-from stack_detector import detect_stack
-from file_detector import detect_file_paths, is_action_prompt
-from agent import cmd_edit, cmd_implement, cmd_smart, apply_changes
-from differ import show_and_confirm
+from .config import build_system_prompt
+from .chat import chat
+from .file_handler import read_file, read_files, write_file, extract_code, scan_project
+from .stack_detector import detect_stack
+from .file_detector import detect_file_paths, is_action_prompt
+from .agent import cmd_edit, cmd_implement, cmd_smart, apply_changes
+from .differ import show_and_confirm
 
 
 def _print_help():

@@ -1,0 +1,17 @@
+README.md
+pyproject.toml
+techcoder_cli/__init__.py
+techcoder_cli/agent.py
+techcoder_cli/chat.py
+techcoder_cli/config.py
+techcoder_cli/differ.py
+techcoder_cli/file_detector.py
+techcoder_cli/file_handler.py
+techcoder_cli/main.py
+techcoder_cli/stack_detector.py
+techcoder_cli.egg-info/PKG-INFO
+techcoder_cli.egg-info/SOURCES.txt
+techcoder_cli.egg-info/dependency_links.txt
+techcoder_cli.egg-info/entry_points.txt
+techcoder_cli.egg-info/requires.txt
+techcoder_cli.egg-info/top_level.txt

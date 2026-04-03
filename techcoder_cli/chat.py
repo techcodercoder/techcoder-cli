@@ -3,7 +3,7 @@ import threading
 import itertools
 import time
 
-from config import MODEL
+from .config import MODEL
 
 
 def chat(messages):

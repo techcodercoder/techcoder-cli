@@ -10,9 +10,9 @@ import re
 
 import ollama
 
-from config import MODEL
-from file_handler import read_file, write_file, extract_code, scan_project
-from file_detector import detect_file_paths
+from .config import MODEL
+from .file_handler import read_file, write_file, scan_project
+from .file_detector import detect_file_paths
 
 
 # ---------------------------------------------------------------------------
