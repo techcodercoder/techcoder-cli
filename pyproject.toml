@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "techcoder-cli"
+version = "0.1.0"
+description = "Local AI coding assistant powered by Gemma 4 + Ollama"
+requires-python = ">=3.10"
+dependencies = ["ollama"]
+
+[project.scripts]
+techcoder = "techcoder_cli.main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["techcoder_cli*"]
