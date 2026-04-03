@@ -67,12 +67,18 @@ git clone https://github.com/techcodercoder/techcoder-cli.git
 cd techcoder-cli
 ```
 
-### 4. Install as global CLI
+### 4. Install pipx (recommended for global CLI tools)
 ```bash
-pip install -e .
+brew install pipx
+pipx ensurepath
 ```
 
-### 5. Run from anywhere
+### 5. Install techcoder-cli
+```bash
+pipx install -e .
+```
+
+### 6. Run from anywhere
 ```bash
 cd /any/project/folder
 techcoder
