@@ -58,15 +58,19 @@ try:
             if not self._files:
                 self.refresh()
 
+            seen = set()
             for filepath in self._files:
-                if filepath.startswith(partial):
-                    # Replace the partial text after '@'
-                    yield Completion(
-                        filepath,
-                        start_position=-len(partial),
-                        display=filepath,
-                        display_meta='file',
-                    )
+                basename = os.path.basename(filepath)
+                # Match full relative path OR just the filename
+                if filepath.startswith(partial) or basename.startswith(partial):
+                    if filepath not in seen:
+                        seen.add(filepath)
+                        yield Completion(
+                            filepath,
+                            start_position=-len(partial),
+                            display=filepath,
+                            display_meta=os.path.dirname(filepath) or '.',
+                        )
 
     def make_prompt_session(cwd: str) -> tuple:
         """
@@ -79,7 +83,7 @@ try:
             history=FileHistory(_HISTORY_FILE),
             auto_suggest=AutoSuggestFromHistory(),
             completer=completer,
-            complete_while_typing=False,   # only complete on Tab
+            complete_while_typing=True,    # show suggestions automatically after '@'
             mouse_support=False,
         )
         return session, completer
@@ -111,15 +115,28 @@ def get_input(prompt_text: str, session=None) -> str:
 def extract_at_mentions(text: str, cwd: str) -> list[str]:
     """
     Return file paths from @filename mentions in text that exist on disk.
+    Supports short names: @login_screen.dart resolves to lib/screens/login_screen.dart.
     Example: "review @lib/main.dart and @pubspec.yaml" → ['lib/main.dart', 'pubspec.yaml']
     """
     import re
     pattern = re.compile(r'@([\w./\\-]+)')
+    all_files = None   # lazy-loaded if needed
     found = []
     for match in pattern.finditer(text):
         rel = match.group(1).rstrip('.,;:)')
         if os.path.isfile(os.path.join(cwd, rel)):
             found.append(rel)
+        else:
+            # Short name: search project for a file whose basename matches
+            if all_files is None:
+                all_files = _scan_files(cwd)
+            name = os.path.basename(rel)
+            matches = [f for f in all_files if os.path.basename(f) == name]
+            if len(matches) == 1:
+                found.append(matches[0])
+            elif len(matches) > 1:
+                # Prefer the closest match (fewest path segments)
+                found.append(min(matches, key=lambda f: f.count(os.sep)))
     return found
 
 
