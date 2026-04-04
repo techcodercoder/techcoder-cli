@@ -1,8 +1,14 @@
+"""
+File I/O and project scanning.
+"""
+
 import os
 
+from ..config.settings import SCAN_IGNORE_DIRS
 
-def read_file(filepath):
-    """Read file contents and return as string, or None if not found."""
+
+def read_file(filepath: str) -> str | None:
+    """Return file contents, or None if not found."""
     try:
         with open(filepath, 'r') as f:
             return f.read()
@@ -17,10 +23,7 @@ def read_files(filepaths: list[str]) -> tuple[str, list[str], list[str]]:
     Read multiple files.
     Returns (combined_context, loaded_paths, failed_paths).
     """
-    parts = []
-    loaded = []
-    failed = []
-
+    parts, loaded, failed = [], [], []
     for filepath in filepaths:
         content = read_file(filepath)
         if content is None:
@@ -28,12 +31,10 @@ def read_files(filepaths: list[str]) -> tuple[str, list[str], list[str]]:
         else:
             loaded.append(filepath)
             parts.append(f"--- {filepath} ---\n{content}")
-
-    combined = '\n\n'.join(parts)
-    return combined, loaded, failed
+    return '\n\n'.join(parts), loaded, failed
 
 
-def write_file(filepath, content):
+def write_file(filepath: str, content: str) -> bool | str:
     """Write content to file. Returns True on success, error string on failure."""
     try:
         os.makedirs(os.path.dirname(filepath) or '.', exist_ok=True)
@@ -44,30 +45,29 @@ def write_file(filepath, content):
         return f"Error writing file: {e}"
 
 
-def extract_code(response):
-    """Extract the first code block from a Gemma response."""
+def extract_code(response: str) -> str:
+    """Extract the first fenced code block from a response."""
     lines = response.split('\n')
-    code_lines = []
-    in_code_block = False
-
+    code_lines, in_block = [], False
     for line in lines:
         if line.startswith('```'):
-            in_code_block = not in_code_block
+            in_block = not in_block
             continue
-        if in_code_block:
+        if in_block:
             code_lines.append(line)
-
     return '\n'.join(code_lines)
 
 
 def scan_project(path: str = '.') -> str:
-    """Scan directory tree, skipping hidden dirs, venv, and __pycache__."""
+    """Recursively scan a directory tree, skipping common noise dirs."""
     result = []
     for root, dirs, files in os.walk(path):
-        dirs[:] = [d for d in dirs if not d.startswith('.')
-                   and d not in ('venv', '__pycache__', 'node_modules', '.dart_tool', 'build')]
-        level = os.path.relpath(root, path).count(os.sep)
-        indent = '  ' * level
+        dirs[:] = [
+            d for d in dirs
+            if d not in SCAN_IGNORE_DIRS and not d.startswith('.')
+        ]
+        level   = os.path.relpath(root, path).count(os.sep)
+        indent  = '  ' * level
         result.append(f"{indent}📁 {os.path.basename(root)}/")
         subindent = '  ' * (level + 1)
         for file in files:

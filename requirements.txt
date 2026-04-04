@@ -1,1 +1,3 @@
 ollama
+requests
+prompt_toolkit
